@@ -9,7 +9,7 @@
                     <li>
                     <?php
                         if ($this->tank_auth->is_logged_in()) {
-                            echo anchor('user/details', lang('topmenu_details'));
+                            echo anchor('account/details', lang('topmenu_details'));
                         } else {
                             echo anchor('auth/register', lang('topmenu_register'));
                         }
