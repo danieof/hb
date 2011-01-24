@@ -1,5 +1,10 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+/*
+ * class auth
+ *
+ * @property CI_Form_validation $form_validation
+ */
 class auth extends MY_Controller
 {
 	function __construct()
@@ -10,6 +15,8 @@ class auth extends MY_Controller
 		$this->load->library('form_validation');
 		$this->load->library('tank_auth');
 		$this->lang->load('tank_auth');
+        $this->form_validation->_error_prefix = '<span class="alert">';
+        $this->form_validation->_error_suffix = '</span>';
 	}
 
 	function index()
