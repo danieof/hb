@@ -9,5 +9,5 @@ class Profile extends DataMapper {
     }
 }
 
-/* End of file profile.php */
-/* Location: ./application/modules/user/models/profile.php */
+/* End of file Profile.php */
+/* Location: ./application/models/Profile.php */
