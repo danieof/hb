@@ -70,7 +70,7 @@ class auth extends MY_Controller
 						$this->form_validation->set_value('remember'),
 						$data['login_by_username'],
 						$data['login_by_email'])) {								// success
-					redirect('auth/login/');
+					redirect('useraccount/details/');
 
 				} else {
 					$errors = $this->tank_auth->get_error_message();
@@ -110,7 +110,8 @@ class auth extends MY_Controller
         $this->template->set('subpagetitle', humanize(__FUNCTION__));
         if ($this->tank_auth->is_logged_in()) {
             $this->tank_auth->logout();
-            $this->_show_message($this->lang->line('auth_message_logged_out'));
+            redirect('welcome/index');
+            //$this->_show_message($this->lang->line('auth_message_logged_out'));
         } else {
             $this->_show_message($this->lang->line('auth_message_not_logged_in'));
         }
@@ -180,6 +181,11 @@ class auth extends MY_Controller
 							$this->_send_email('welcome', $data['email'], $data);
 						}
 						unset($data['password']); // Clear password (just for any case)
+
+                        // tworzymy od razu konto główne !!!
+                        $user = new User();
+                        $user->where('id', $data['user_id'])->get();
+                        $user->makeFirstAccount();
 
 						$this->_show_message($this->lang->line('auth_message_registration_completed_2'));//.' '.anchor('auth/login/', 'Login'));
 						return;
@@ -466,8 +472,13 @@ class auth extends MY_Controller
 			$data['errors'] = array();
 
 			if ($this->form_validation->run()) {								// validation ok
+                $user = new User();
+                $user->where('id', $this->tank_auth->get_user_id())->get();
+                $user->deleteAccount();
+                
 				if ($this->tank_auth->delete_user(
 						$this->form_validation->set_value('password'))) {		// success
+                    
 					$this->_show_message($this->lang->line('auth_message_unregistered'));
 					return;
 

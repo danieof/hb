@@ -5,6 +5,7 @@ $lang['topmenu_register'] = 'Register';
 $lang['topmenu_login'] = 'Login';
 $lang['topmenu_logout'] = 'Logout';
 $lang['topmenu_details'] = 'Account details';
+$lang['topmenu_delete'] = 'Delete account';
 
 /* End of file common_lang.php */
 /* Location: ./system/language/polish/common_lang.php */
