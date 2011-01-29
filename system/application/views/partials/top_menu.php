@@ -2,29 +2,50 @@
 	<div class="outernav">
 		<div class="nav">
 			<div class="innernav">
+                <?php
+                if (!$this->tank_auth->is_logged_in()) :
+                ?>
                 <ul>
                     <li>
                         <?=anchor('', lang('topmenu_mainpage'))?>
                     </li>
                     <li>
                     <?php
-                        if ($this->tank_auth->is_logged_in()) {
-                            echo anchor('account/details', lang('topmenu_details'));
-                        } else {
-                            echo anchor('auth/register', lang('topmenu_register'));
-                        }
+                        echo anchor('auth/register', lang('topmenu_register'));
                     ?>
                     </li>
                     <li>
                     <?php
-                        if (!$this->tank_auth->is_logged_in()) {
-                            echo anchor('auth/login', lang('topmenu_login'));
-                        } else {
-                            echo anchor('auth/logout', lang('topmenu_logout'));
-                        }
+                        echo anchor('auth/login', lang('topmenu_login'));
                     ?>
                     </li>
                 </ul>
+                <?php
+                else :
+                ?>
+                <ul>
+                    <li>
+                        <?=anchor('', lang('topmenu_mainpage'))?>
+                    </li>
+                    <li>
+                    <?php
+                        echo anchor('useraccount/details', lang('topmenu_details'));
+                    ?>
+                    </li>
+                    <li>
+                    <?php
+                        echo anchor('auth/unregister', lang('topmenu_delete'));
+                    ?>
+                    </li>
+                    <li>
+                    <?php
+                        echo anchor('auth/logout', lang('topmenu_logout'));
+                    ?>
+                    </li>
+                </ul>
+                <?php
+                endif;
+                ?>
 			</div>
 		</div>
 	</div>
