@@ -18,8 +18,8 @@ class User extends DataMapper {
 
             // make privileges_user
             $pu = new Privileges_user();
-            $pu->where('user_id', $this->id) // for this user
-               ->where('privilege_id', $this->privilege->where('privilege_name', 'admin')->get()->id)  // admin privilege
+            $pu->where('privilege_id', $this->privilege->where('privilege_name', 'admin')->get()->id)  // admin privilege
+               ->where('user_id', $this->id) // for this user
                ->get();
             
             // make account
@@ -33,7 +33,8 @@ class User extends DataMapper {
                 $number = 1;
             }
             $account->number = $number;
-            $account->save(array($name, $pu));
+            $account->save($pu);
+            $account->save($name);
             
             $this->save($account);
             return true;
@@ -41,8 +42,33 @@ class User extends DataMapper {
         return false;
     }
 
-    public function deleteAccount() {
-        
+    public function deleteAccounts() {
+        // pobierz id wszystkich kont
+        foreach ($this->account->get()->all as $acc) {
+            $id = $acc->id;
+
+            if (1 < $acc->user->count()) {
+                //echo $id . ' - wiecej niz jeden user<br />';continue;
+                // delete only accounts_users
+                $au = new Account_user();
+                $au->where('user_id', $this->id)
+                   ->where('account_id', $id)
+                   ->get()->delete();
+                // delete only accounts_privilege_users
+                $acc->privileges_user->where('user_id', $this->id)->get()->delete();
+            } else {
+                //echo $id . ' - jeden user<br />';continue;
+                $acc->name->get()->delete();
+                $acc->subaccount->get()->delete_all();
+                $acc->privileges_user->where('user_id', $this->id)->get()->delete();
+                $acc->delete();
+            }
+        }
+
+        // usun profil
+        $this->delete($this->profile->get());
+        // usun privilege dla usera
+        $this->privilege->get()->delete_all();
     }
 }
 

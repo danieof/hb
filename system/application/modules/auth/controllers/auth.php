@@ -474,7 +474,7 @@ class auth extends MY_Controller
 			if ($this->form_validation->run()) {								// validation ok
                 $user = new User();
                 $user->where('id', $this->tank_auth->get_user_id())->get();
-                $user->deleteAccount();
+                $user->deleteAccounts();
                 
 				if ($this->tank_auth->delete_user(
 						$this->form_validation->set_value('password'))) {		// success
