@@ -2,11 +2,22 @@
 
 class User extends DataMapper {
     public $table = 'users';
-    public $has_one = array('profile');
+    public $has_one = array('profile', 'user_profile');
     public $has_many = array('account', 'privilege');
 
     public function  __construct() {
         parent::DataMapper();
+    }
+
+    public function changeDetails($data) {
+        $this->profile->get();
+        $this->profile->name = $data['name'];
+        $this->profile->surname = $data['surname'];
+        $this->profile->birthcity = $data['birthcity'];
+        $this->profile->birthdate = $data['birthdate'];
+        $this->profile->gender = ('male' == $data['gender'])?1:0;
+        $this->profile->save();
+        $this->save($this->profile);
     }
 
     public function makeFirstAccount() {
@@ -67,6 +78,7 @@ class User extends DataMapper {
 
         // usun profil
         $this->delete($this->profile->get());
+        $this->delete($this->user_profile->get());
         // usun privilege dla usera
         $this->privilege->get()->delete_all();
     }
