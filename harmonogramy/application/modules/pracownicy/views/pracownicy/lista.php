@@ -1,6 +1,7 @@
 <?php
 echo link_tag(base_url() . 'public/css/table.css', 'stylesheet', 'text/css');
 echo '<script type="text/javascript" src="' . base_url() . '/public/javascript/js/jquery-1.4.4.min.js"></script>';
+if (0 < $num_workers) :
 ?>
 <table>
     <caption>Pracownicy</caption>
@@ -44,3 +45,8 @@ echo '<script type="text/javascript" src="' . base_url() . '/public/javascript/j
         });
     });
 </script>
+<?php
+else :
+echo 'Nie ma pracownikow.';
+endif;
+?>

@@ -44,7 +44,7 @@ $config['OCU_profile'] = FALSE;
 | the views as the $site_name variable for use in layouts and views.
 |
 */
-$config['OCU_site_name'] = "Klasztor - dyżury";
+$config['OCU_site_name'] = "Harmonogramy";
 
 /*
 |--------------------------------------------------------------------

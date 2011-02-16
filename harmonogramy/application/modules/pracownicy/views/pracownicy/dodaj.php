@@ -44,7 +44,7 @@ echo form_open(current_url());
         <td><?php echo form_error($phone['name'],'<span>','</span>'); ?></td>
     </tr>
     <tr>
-        <td><?php echo form_submit('', 'Dodaj'); ?></td>
+        <td><?php echo form_submit('', $button_label); ?></td>
     </tr>
 </table>
 <?php

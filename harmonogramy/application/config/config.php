@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://homebudget.localhost/stas/';
+$config['base_url']	= 'http://homebudget.localhost/harmonogramy/';
 
 /*
 |--------------------------------------------------------------------------

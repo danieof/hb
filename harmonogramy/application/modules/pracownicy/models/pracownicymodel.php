@@ -27,13 +27,10 @@ class Pracownicymodel extends CI_Model {
             'phone'     => @$data['phone']
         );
         $this->db->insert($this->table_workers, $d);
-        $z = $this->db->select('LAST_INSERT_ID() AS id')
-                      ->get()->result_array();
-        if (!empty($z)) {
-            if (0 < $z[0]['id']) {
-                $this->addUserWorker($z[0]['id']);
-                return true;
-            }
+        $z = $this->db->insert_id();
+        if (0 < $z) {
+            $this->addUserWorker($z);
+            return true;
         }
         return false;
     }
@@ -48,6 +45,17 @@ class Pracownicymodel extends CI_Model {
         }
     }
 
+    public function updateWorker($data) {
+        $d = array(
+            'firstname' => $data['firstname'],
+            'surname'   => $data['surname'],
+            'email'     => @$data['email'],
+            'phone'     => @$data['phone']
+        );
+        $worker_id = $data['worker_id'];
+        $this->db->where('id', $worker_id)->update($this->table_workers, $d);
+    }
+
     public function getWorkers() {
         $res = $this->db->select()
                         ->from($this->table_users_workers . ' AS uw ')
@@ -57,11 +65,12 @@ class Pracownicymodel extends CI_Model {
         return $res;
     }
 
-    public function getWorker($worker_id) {
+    public function getUserWorker($worker_id) {
         $res = $this->db->select()
                         ->from($this->table_users_workers . ' AS uw ')
                         ->join($this->table_workers . ' AS w ', 'w.id = uw.worker_id')
                         ->where('uw.user_id', $this->user_id)
+                        ->where('uw.worker_id', $worker_id)
                         ->get()->row_array();
         return $res;
     }

@@ -4,19 +4,14 @@
  * @property Pracownicymodel $pm
  */
 class Pracownicy extends MY_Controller {
+    private $worker_form_config;
+    
 	public function __construct() {
 		parent::__construct();
         if (!$this->tank_auth->is_logged_in())
             redirect('/uzytkownicy/zaloguj');
         $this->load->model('pracownicymodel','pm');
-	}
-
-	public function index() {
-        redirect('pracownicy/lista');
-	}
-
-    public function dodaj() {
-        $config = array(
+        $this->worker_form_config = array(
             array(
                 'field' => 'firstname',
                 'label' => 'Imię',
@@ -35,11 +30,17 @@ class Pracownicy extends MY_Controller {
             array(
                 'field' => 'phone',
                 'label' => 'Telefon',
-                'rules' => 'callback_valid_phone'
+                'rules' => ''
             ),
         );
+	}
 
-        $this->form_validation->set_rules($config);
+	public function index() {
+        redirect('pracownicy/lista');
+	}
+
+    public function dodaj() {
+        $this->form_validation->set_rules($this->worker_form_config);
 
         if ($this->form_validation->run()) {
             $data = array(
@@ -54,6 +55,7 @@ class Pracownicy extends MY_Controller {
             $this->template->current_view = 'pracownicy/pracownicy/sukces';
             $this->template->render();
         } else {
+            $this->template->set('button_label', 'Dodaj');
             $this->template->render();
         }
     }
@@ -61,10 +63,32 @@ class Pracownicy extends MY_Controller {
     public function edytujdane() {
         $worker_id = $this->uri->segment(3);
         $worker_id = (integer)$worker_id;
-        if (0 < $worker_id) {
-            $worker = $this->pm->getWorker($worker_id);
+        if ($worker = $this->pm->getUserWorker($worker_id)) {
+            $this->form_validation->set_rules($this->worker_form_config);
 
-            $this->template->render();
+            if ($this->form_validation->run()) {
+                $data = array(
+                    'firstname' => ucfirst($this->input->post('firstname')),
+                    'surname' => ucfirst($this->input->post('surname')),
+                    'email' => $this->input->post('email'),
+                    'phone' => $this->input->post('phone'),
+                    'worker_id' => $worker['id']
+                );
+
+                $this->pm->updateWorker($data);
+
+                $this->template->current_view = 'pracownicy/pracownicy/sukces';
+                $this->template->render();
+            } else {
+                $_POST['firstname'] = $worker['firstname'];
+                $_POST['surname'] = $worker['surname'];
+                $_POST['email'] = $worker['email'];
+                $_POST['phone'] = $worker['phone'];
+                
+                $this->template->current_view = 'pracownicy/pracownicy/dodaj';
+                $this->template->set('button_label', 'Zapisz');
+                $this->template->render();
+            }
         }
     }
 

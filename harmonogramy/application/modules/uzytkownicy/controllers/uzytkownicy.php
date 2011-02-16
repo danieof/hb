@@ -10,17 +10,17 @@ class Uzytkownicy extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
         $this->load->library('security');
-        //$this->load->model('users_model');
 	}
 
 	public function index() {
         if (!$this->tank_auth->is_logged_in())
             redirect('uzytkownicy/zaloguj');
-        else
-            redirect('uzytkownicy/powitanie');
+        redirect('uzytkownicy/powitanie');
 	}
 
     public function powitanie() {
+        if (!$this->tank_auth->is_logged_in())
+            redirect('uzytkownicy/zaloguj');
         $this->template->render();
     }
 
@@ -95,6 +95,8 @@ class Uzytkownicy extends MY_Controller {
     }
 
     public function wyloguj() {
+        if (!$this->tank_auth->is_logged_in())
+            redirect('uzytkownicy/zaloguj');
 		$this->tank_auth->logout();
         $this->template->render();
     }
