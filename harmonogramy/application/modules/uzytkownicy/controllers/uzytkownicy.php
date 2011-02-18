@@ -186,7 +186,7 @@ class Uzytkownicy extends MY_Controller {
 		}
     }
 
-    public function usunkonto() {
+    public function usun_konto() {
 		if (!$this->tank_auth->is_logged_in()) {
 			redirect('/uzytkownicy/zaloguj/');
 		} else {
@@ -195,10 +195,10 @@ class Uzytkownicy extends MY_Controller {
 			$data['errors'] = array();
 
 			if ($this->form_validation->run()) {
-                // usuwamy konto
+                // usuwamy konto (wszystkich pracownikow)
                 
                 
-                $this->template->current_view = 'uzytkownicy/uzytkownicy/usunsukces';
+                $this->template->current_view = 'uzytkownicy/uzytkownicy/sukces_usun';
 			} else {
                 $this->template->set($data);
             }
