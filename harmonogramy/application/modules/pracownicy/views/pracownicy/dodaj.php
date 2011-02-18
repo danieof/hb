@@ -2,22 +2,22 @@
 $imie = array(
     'name' => 'firstname',
     'label' => 'Imię:',
-    'value' => set_value('firstname')
+    'value' => (isset($_POST['firstname']))?$_POST['firstname']:set_value('firstname')
 );
 $nazwisko = array(
     'name' => 'surname',
     'label' => 'Nazwisko:',
-    'value' => set_value('surname')
+    'value' => (isset($_POST['surname']))?$_POST['surname']:set_value('surname')
 );
 $email = array(
     'name' => 'email',
     'label' => 'E-mail:',
-    'value' => set_value('email')
+    'value' => (isset($_POST['email']))?$_POST['email']:set_value('email')
 );
 $phone = array(
     'name' => 'phone',
     'label' => 'Telefon:',
-    'value' => set_value('phone')
+    'value' => (isset($_POST['phone']))?$_POST['phone']:set_value('phone')
 );
 
 echo form_open(current_url());

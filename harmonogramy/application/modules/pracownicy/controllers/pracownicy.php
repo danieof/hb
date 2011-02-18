@@ -10,6 +10,7 @@ class Pracownicy extends MY_Controller {
 		parent::__construct();
         if (!$this->tank_auth->is_logged_in())
             redirect('/uzytkownicy/zaloguj');
+        
         $this->load->model('pracownicymodel','pm');
         $this->worker_form_config = array(
             array(
@@ -39,20 +40,29 @@ class Pracownicy extends MY_Controller {
         redirect('pracownicy/lista');
 	}
 
+    public function lista() {
+        $workers = $this->pm->getWorkers();
+        $this->template->set(array('workers' => $workers, 'num_workers' => count($workers)));
+        $this->template->render();
+    }
+
     public function dodaj() {
         $this->form_validation->set_rules($this->worker_form_config);
 
         if ($this->form_validation->run()) {
             $data = array(
-                'firstname' => ucfirst($this->input->post('firstname')),
-                'surname' => ucfirst($this->input->post('surname')),
-                'email' => $this->input->post('email'),
+                'firstname' => strtolower($this->input->post('firstname')),
+                'surname' => strtolower($this->input->post('surname')),
+                'email' => strtolower($this->input->post('email')),
                 'phone' => $this->input->post('phone')
             );
 
-            $this->pm->addWorker($data);
-
-            $this->template->current_view = 'pracownicy/pracownicy/sukces';
+            if (!$this->pm->checkWorkerExistance($data['firstname'], $data['surname'])) {
+                $this->pm->addWorker($data);
+                $this->template->current_view = 'pracownicy/pracownicy/sukces_dodaj';
+            } else {
+                $this->template->current_view = 'pracownicy/pracownicy/error_dodaj';
+            }
             $this->template->render();
         } else {
             $this->template->set('button_label', 'Dodaj');
@@ -60,24 +70,27 @@ class Pracownicy extends MY_Controller {
         }
     }
 
-    public function edytujdane() {
+    public function edytuj() {
         $worker_id = $this->uri->segment(3);
-        $worker_id = (integer)$worker_id;
-        if ($worker = $this->pm->getUserWorker($worker_id)) {
+        $worker_id = (int)$worker_id;
+        if ($worker = $this->pm->getWorker($worker_id)) {
             $this->form_validation->set_rules($this->worker_form_config);
 
             if ($this->form_validation->run()) {
                 $data = array(
-                    'firstname' => ucfirst($this->input->post('firstname')),
-                    'surname' => ucfirst($this->input->post('surname')),
-                    'email' => $this->input->post('email'),
+                    'firstname' => strtolower($this->input->post('firstname')),
+                    'surname' => strtolower($this->input->post('surname')),
+                    'email' => strtolower($this->input->post('email')),
                     'phone' => $this->input->post('phone'),
                     'worker_id' => $worker['id']
                 );
 
-                $this->pm->updateWorker($data);
-
-                $this->template->current_view = 'pracownicy/pracownicy/sukces';
+                if (!$this->pm->checkWorkerExistance($data['firstname'], $data['surname'], $data['worker_id'])) {
+                    $this->pm->updateWorker($data);
+                    $this->template->current_view = 'pracownicy/pracownicy/sukces_zmien';
+                } else {
+                    $this->template->current_view = 'pracownicy/pracownicy/error_zmien';
+                }
                 $this->template->render();
             } else {
                 $_POST['firstname'] = $worker['firstname'];
@@ -90,16 +103,6 @@ class Pracownicy extends MY_Controller {
                 $this->template->render();
             }
         }
-    }
-
-    public function edytujlimity() {
-        
-    }
-
-    public function lista() {
-        $workers = $this->pm->getWorkers();
-        $this->template->set(array('workers' => $workers, 'num_workers' => count($workers)));
-        $this->template->render();
     }
 }
 

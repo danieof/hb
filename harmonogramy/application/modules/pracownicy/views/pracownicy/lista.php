@@ -40,7 +40,7 @@ if (0 < $num_workers) :
         $("tr[id!='']").each(function(){
             $(this).click(function(){
                 id = $(this).attr('id');
-                window.location = '<?=site_url('pracownicy/edytujdane');?>/' + id;
+                window.location = '<?=site_url('pracownicy/edytuj');?>/' + id;
             });
         });
     });
