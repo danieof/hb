@@ -10,26 +10,57 @@ class Uzytkownicy extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
         $this->load->library('security');
+        $this->load->model('uzytkownicy_model', 'um');
 	}
 
 	public function index() {
         if (!$this->tank_auth->is_logged_in())
-            redirect('uzytkownicy/zaloguj');
+            redirect('uzytkownicy/zaloguj/');
         redirect('uzytkownicy/powitanie');
 	}
 
     public function powitanie() {
         if (!$this->tank_auth->is_logged_in())
-            redirect('uzytkownicy/zaloguj');
+            redirect('uzytkownicy/zaloguj/');
         $this->template->render();
     }
 
+    public function lista_pracownicy() {
+        if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
+
+        // dodac paginacje!!!
+        $workers = $this->um->getWorkers();
+        $this->template->set(array('workers' => $workers, 'num_workers' => count($workers)));
+        $this->template->render();
+
+        $this->template->render();
+    }
+
+    public function lista_obowiazki() {
+        if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
+
+        $this->template->render();
+    }
+
+    public function lista_harmonogramy() {
+        if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
+
+        $this->template->render();
+    }
+
+    public function lista_role() {
+        if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
+
+        $this->template->render();
+    }
+
+// AUTORYZACJA
     public function zaloguj() {
 		if ($this->tank_auth->is_logged_in()) {									// logged in
-			redirect('/uzytkownicy/powitanie');
+			redirect('uzytkownicy/powitanie/');
 
 		} elseif ($this->tank_auth->is_logged_in(FALSE)) {						// logged in, not activated
-			redirect('/uzytkownicy/wyslij_ponownie/');
+			redirect('uzytkownicy/wyslij_ponownie/');
 
 		} else {
 			$data['login_by_username'] = ($this->config->item('login_by_username', 'tank_auth') AND
@@ -64,7 +95,7 @@ class Uzytkownicy extends MY_Controller {
 						$this->form_validation->set_value('remember'),
 						$data['login_by_username'],
 						$data['login_by_email'])) {								// success
-					redirect('/uzytkownicy/powitanie');
+					redirect('uzytkownicy/powitanie/');
 
 				} else {
 					$errors = $this->tank_auth->get_error_message();
@@ -73,7 +104,7 @@ class Uzytkownicy extends MY_Controller {
 						return;
 
 					} elseif (isset($errors['not_activated'])) {				// not activated user
-						redirect('/uzytkownicy/wyslij_ponownie/');
+						redirect('uzytkownicy/wyslij_ponownie/');
 
 					} else {													// fail
 						foreach ($errors as $k => $v)	$data['errors'][$k] = $this->lang->line($v);
@@ -96,17 +127,17 @@ class Uzytkownicy extends MY_Controller {
 
     public function wyloguj() {
         if (!$this->tank_auth->is_logged_in())
-            redirect('uzytkownicy/zaloguj');
+            redirect('uzytkownicy/zaloguj/');
 		$this->tank_auth->logout();
         $this->template->render();
     }
 
     public function zarejestruj() {
 		if ($this->tank_auth->is_logged_in()) {									// logged in
-			redirect('/uzytkownicy/powitanie');
+			redirect('uzytkownicy/powitanie/');
 
 		} elseif ($this->tank_auth->is_logged_in(FALSE)) {						// logged in, not activated
-			redirect('/uzytkownicy/wyslij_ponownie/');
+			redirect('uzytkownicy/wyslij_ponownie/');
 
 		} elseif (!$this->config->item('allow_registration', 'tank_auth')) {	// registration is off
 			$this->_show_message($this->lang->line('auth_message_registration_disabled'));
@@ -188,7 +219,7 @@ class Uzytkownicy extends MY_Controller {
 
     public function usun_konto() {
 		if (!$this->tank_auth->is_logged_in()) {
-			redirect('/uzytkownicy/zaloguj/');
+			redirect('uzytkownicy/zaloguj/');
 		} else {
 			$this->form_validation->set_rules('password', 'Password', 'trim|required|xss_clean');
 
@@ -208,7 +239,7 @@ class Uzytkownicy extends MY_Controller {
 
     public function wyslij_ponownie() {
 		if (!$this->tank_auth->is_logged_in(FALSE)) {							// not logged in or activated
-			redirect('/uzytkownicy/zaloguj/');
+			redirect('uzytkownicy/zaloguj/');
 
 		} else {
 			$this->form_validation->set_rules('email', 'Email', 'trim|required|xss_clean|valid_email');
@@ -239,10 +270,10 @@ class Uzytkownicy extends MY_Controller {
 
     public function przypomnij_haslo() {
 		if ($this->tank_auth->is_logged_in()) {									// logged in
-			redirect('/uzytkownicy/powitanie');
+			redirect('uzytkownicy/powitanie/');
 
 		} elseif ($this->tank_auth->is_logged_in(FALSE)) {						// logged in, not activated
-			redirect('/uzytkownicy/wyslij_ponownie/');
+			redirect('uzytkownicy/wyslij_ponownie/');
 
 		} else {
 			$this->form_validation->set_rules('login', 'Email or login', 'trim|required|xss_clean');
