@@ -4,15 +4,27 @@
  * @property Pracownicymodel $pm
  */
 class Pracownicy extends MY_Controller {
-    private $worker_form_config;
+    private $worker_id;
     
 	public function __construct() {
 		parent::__construct();
         if (!$this->tank_auth->is_logged_in())
-            redirect('/uzytkownicy/zaloguj');
-        
-        $this->load->model('pracownicymodel','pm');
-        $this->worker_form_config = array(
+            redirect('uzytkownicy/zaloguj/');
+
+        $this->worker_id = (int) $this->uri->segment(3);
+        if (0 > $this->worker_id) {
+            redirect('pracownicy/edytuj/0');
+        }
+
+        $this->load->model('pracownicy_model','pm');
+	}
+
+	public function index() {
+        redirect('pracownicy/edytuj/0');
+	}
+
+    public function edytuj() {
+        $worker_form_config = array(
             array(
                 'field' => 'firstname',
                 'label' => 'Imię',
@@ -26,7 +38,7 @@ class Pracownicy extends MY_Controller {
             array(
                 'field' => 'email',
                 'label' => 'E-mail',
-                'rules' => 'valid_email'
+                'rules' => 'valid_email|required'
             ),
             array(
                 'field' => 'phone',
@@ -34,75 +46,52 @@ class Pracownicy extends MY_Controller {
                 'rules' => ''
             ),
         );
-	}
 
-	public function index() {
-        redirect('pracownicy/lista');
-	}
-
-    public function lista() {
-        $workers = $this->pm->getWorkers();
-        $this->template->set(array('workers' => $workers, 'num_workers' => count($workers)));
-        $this->template->render();
-    }
-
-    public function dodaj() {
-        $this->form_validation->set_rules($this->worker_form_config);
-
-        if ($this->form_validation->run()) {
-            $data = array(
-                'firstname' => strtolower($this->input->post('firstname')),
-                'surname' => strtolower($this->input->post('surname')),
-                'email' => strtolower($this->input->post('email')),
-                'phone' => $this->input->post('phone')
-            );
-
-            if (!$this->pm->checkWorkerExistance($data['firstname'], $data['surname'])) {
-                $this->pm->addWorker($data);
-                $this->template->current_view = 'pracownicy/pracownicy/sukces_dodaj';
+        $this->form_validation->set_rules($worker_form_config);
+        
+        if (true === $this->form_validation->run()) {
+            if (true === $this->editWorker()) {
+                $this->template->current_view = 'pracownicy/pracownicy/sukces_zmien';
             } else {
-                $this->template->current_view = 'pracownicy/pracownicy/error_dodaj';
+                $this->template->current_view = 'pracownicy/pracownicy/error_zmien';
             }
-            $this->template->render();
         } else {
-            $this->template->set('button_label', 'Dodaj');
-            $this->template->render();
-        }
-    }
+            if (0 !== $this->worker_id) {
+                $worker = $this->pm->getWorker($this->worker_id);
 
-    public function edytuj() {
-        $worker_id = $this->uri->segment(3);
-        $worker_id = (int)$worker_id;
-        if ($worker = $this->pm->getWorker($worker_id)) {
-            $this->form_validation->set_rules($this->worker_form_config);
-
-            if ($this->form_validation->run()) {
-                $data = array(
-                    'firstname' => strtolower($this->input->post('firstname')),
-                    'surname' => strtolower($this->input->post('surname')),
-                    'email' => strtolower($this->input->post('email')),
-                    'phone' => $this->input->post('phone'),
-                    'worker_id' => $worker['id']
-                );
-
-                if (!$this->pm->checkWorkerExistance($data['firstname'], $data['surname'], $data['worker_id'])) {
-                    $this->pm->updateWorker($data);
-                    $this->template->current_view = 'pracownicy/pracownicy/sukces_zmien';
-                } else {
-                    $this->template->current_view = 'pracownicy/pracownicy/error_zmien';
-                }
-                $this->template->render();
-            } else {
                 $_POST['firstname'] = $worker['firstname'];
                 $_POST['surname'] = $worker['surname'];
                 $_POST['email'] = $worker['email'];
                 $_POST['phone'] = $worker['phone'];
-                
-                $this->template->current_view = 'pracownicy/pracownicy/dodaj';
-                $this->template->set('button_label', 'Zapisz');
-                $this->template->render();
             }
         }
+        $this->template->render();
+    }
+
+    public function lista_obowiazki() {
+        $this->template->render();
+    }
+
+    public function edytuj_obowiazki() {
+        $this->template->render();
+    }
+
+    public function usun() {
+        $this->deleteWorker();
+    }
+
+    // MODEL INTERFACE
+    public function editWorker() {
+        if ($this->pm->editWorker($this->worker_id))
+            return true;
+        return false;
+    }
+
+    public function deleteWorker() {
+        if (true === $this->pm->deleteWorker($this->worker_id)) {
+            return true;
+        }
+        return false;
     }
 }
 
