@@ -2,15 +2,20 @@
 
 /**
  * @property Template $template
- * @property Users_Model $users_model
  * @property CI_URI $uri
  * @property CI_Form_validation $form_validation
+ * @property Uzytkownicy_model $um
  */
 class Uzytkownicy extends MY_Controller {
+    private $user_id;
+    public $data;
+
 	public function __construct() {
 		parent::__construct();
         $this->load->library('security');
         $this->load->model('uzytkownicy_model', 'um');
+        $this->user_id = $this->session->userdata('user_id');
+        $this->data['per_page'] = 10;
 	}
 
 	public function index() {
@@ -28,30 +33,65 @@ class Uzytkownicy extends MY_Controller {
     public function lista_pracownicy() {
         if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
 
-        // dodac paginacje!!!
-        $workers = $this->um->getWorkers();
-        $this->template->set(array('workers' => $workers, 'num_workers' => count($workers)));
-        $this->template->render();
-
+        $this->data['base_url'] = site_url('uzytkownicy/lista_pracownicy/');
+        $this->data['total_rows'] = $this->um->countWorkers();
+        $this->data['workers'] = $this->um->getWorkers($this->data['per_page'], (int) $this->uri->segment(3));
+        $this->data['pagination'] = $this->pagination();
+        
+        $this->template->set($this->data);
         $this->template->render();
     }
 
     public function lista_obowiazki() {
         if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
 
+        $this->data['base_url'] = site_url('uzytkownicy/lista_obowiazki/');
+        $this->data['total_rows'] = $this->um->countDuties();
+        $this->data['duties'] = $this->um->getDuties($this->data['per_page'], (int) $this->uri->segment(3));
+        $this->data['pagination'] = $this->pagination();
+        
+        $this->template->set($this->data);
         $this->template->render();
     }
 
     public function lista_harmonogramy() {
         if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
 
+        $this->data['base_url'] = site_url('uzytkownicy/lista_harmonogramy/');
+        $this->data['total_rows'] = $this->um->countSchedules();
+        $this->data['schedules'] = $this->um->getSchedules($this->data['per_page'], (int) $this->uri->segment(3));
+        $this->data['pagination'] = $this->pagination();
+
+        $this->template->set($this->data);
         $this->template->render();
     }
 
     public function lista_role() {
         if (!$this->tank_auth->is_logged_in()) redirect('uzytkownicy/zaloguj/');
 
+        $this->data['base_url'] = site_url('uzytkownicy/lista_role/');
+        $this->data['total_rows'] = $this->um->countRoles();
+        $this->data['roles'] = $this->um->getRoles($this->data['per_page'], (int) $this->uri->segment(3));
+        $this->data['pagination'] = $this->pagination();
+
+        $this->template->set($this->data);
         $this->template->render();
+    }
+
+    private function pagination() {
+        $this->load->library('pagination');
+        
+        $config = array(
+            'base_url' => $this->data['base_url'],
+        	'total_rows' => $this->data['total_rows'],
+        	'per_page' => $this->data['per_page'],
+        	'uri_segment' => 3,
+        	'num_links' => 2
+        );
+
+        $this->pagination->initialize($config);
+
+        return $this->pagination->create_links();
     }
 
 // AUTORYZACJA
@@ -217,26 +257,6 @@ class Uzytkownicy extends MY_Controller {
 		}
     }
 
-    public function usun_konto() {
-		if (!$this->tank_auth->is_logged_in()) {
-			redirect('uzytkownicy/zaloguj/');
-		} else {
-			$this->form_validation->set_rules('password', 'Password', 'trim|required|xss_clean');
-
-			$data['errors'] = array();
-
-			if ($this->form_validation->run()) {
-                // usuwamy konto (wszystkich pracownikow)
-                
-                
-                $this->template->current_view = 'uzytkownicy/uzytkownicy/sukces_usun';
-			} else {
-                $this->template->set($data);
-            }
-            $this->template->render();
-		}
-    }
-
     public function wyslij_ponownie() {
 		if (!$this->tank_auth->is_logged_in(FALSE)) {							// not logged in or activated
 			redirect('uzytkownicy/zaloguj/');
@@ -299,6 +319,26 @@ class Uzytkownicy extends MY_Controller {
 			}
 
             $this->template->set($data);
+            $this->template->render();
+		}
+    }
+
+    public function usun_konto() {
+		if (!$this->tank_auth->is_logged_in()) {
+			redirect('uzytkownicy/zaloguj/');
+		} else {
+			$this->form_validation->set_rules('password', 'Password', 'trim|required|xss_clean');
+
+			$data['errors'] = array();
+
+			if ($this->form_validation->run()) {
+                // usuwamy konto (wszystkich pracownikow)
+
+
+                $this->template->current_view = 'uzytkownicy/uzytkownicy/sukces_usun';
+			} else {
+                $this->template->set($data);
+            }
             $this->template->render();
 		}
     }

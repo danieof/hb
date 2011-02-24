@@ -1,2 +1,3 @@
 <?php
-echo 'obowiazki';
+echo 'obowiazki<br />';
+print_R($duties);

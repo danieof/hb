@@ -1,13 +1,12 @@
 <?php
 echo link_tag(base_url() . 'public/css/table.css', 'stylesheet', 'text/css');
 echo '<script type="text/javascript" src="' . base_url() . '/public/javascript/js/jquery-1.4.4.min.js"></script>';
-if (0 < $num_workers) :
+if (0 < $total_rows) :
 ?>
 <table>
     <caption>Pracownicy</caption>
     <thead>
         <tr>
-            <th scope="col">L.p.</th>
             <th scope="col">Imię</th>
             <th scope="col">Nazwisko</th>
             <th scope="col">E-mail</th>
@@ -21,7 +20,6 @@ if (0 < $num_workers) :
     <?php else : ?>
     <tr class="odd" id="<?=$worker['id'];?>">
     <?php endif; ?>
-        <th scope="row"><?=$k+1?></th>
         <td><?=$worker['firstname'];?></td>
         <td><?=$worker['surname'];?></td>
         <td><?=$worker['email'];?></td>
@@ -31,9 +29,10 @@ if (0 < $num_workers) :
     </tbody>
     <tfoot>
         <th scope="row">Wszystkich:</th>
-        <td colspan="4"><?=$num_workers?></td>
+        <td colspan="4"><?=$total_rows?></td>
     </tfoot>
 </table>
+<div class="pagination"><?=$pagination;?></div>
 
 <script type="text/javascript">
     $(function(){

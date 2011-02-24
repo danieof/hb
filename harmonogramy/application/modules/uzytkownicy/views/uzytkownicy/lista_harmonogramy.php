@@ -1,2 +1,3 @@
 <?php
-echo 'harmonogramy';
+echo 'harmonogramy<br />';
+print_r($schedules);
