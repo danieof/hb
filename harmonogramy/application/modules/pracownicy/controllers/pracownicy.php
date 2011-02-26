@@ -4,27 +4,43 @@
  * @property Pracownicymodel $pm
  */
 class Pracownicy extends MY_Controller {
-    private $worker_id;
-    
 	public function __construct() {
 		parent::__construct();
         if (!$this->tank_auth->is_logged_in())
             redirect('uzytkownicy/zaloguj/');
 
-        $this->worker_id = (int) $this->uri->segment(3);
-        if (0 > $this->worker_id) {
-            redirect('pracownicy/edytuj/0');
-        }
+        $this->data['worker_id'] = (int) $this->uri->segment(3);
+        if (0 > $this->data['worker_id'] &&
+            !preg_match('#pracownicy/lista#i', current_url()))
+            redirect('pracownicy/edytuj/');
 
         $this->load->model('pracownicy_model','pm');
 	}
 
 	public function index() {
-        redirect('pracownicy/edytuj/0');
+        redirect('pracownicy/lista/');
 	}
 
+    public function lista() {
+        $this->data['pagination_config']['base_url'] = site_url('pracownicy/lista/');
+        $this->data['pagination_config']['num_links'] = 2;
+        $this->data['pagination_config']['per_page'] = 10;
+        $this->data['pagination_config']['uri_segment'] = 3;
+        $this->data['pagination_config']['total_rows'] = $this->pm->countWorkers();
+
+        $this->data['total_rows'] = $this->data['pagination_config']['total_rows'];
+        $this->data['workers'] = $this->pm->getWorkers($this->data['pagination_config']['per_page'],
+                                                       (int) $this->uri->segment(3));
+        $this->data['pagination'] = $this->pagination();
+        $this->data['edit_location'] = site_url('pracownicy/edytuj');
+        $this->data['css'] .= ',table';
+
+        $this->template->set($this->data);
+        $this->template->render();
+    }
+
     public function edytuj() {
-        $worker_form_config = array(
+        $config = array(
             array(
                 'field' => 'firstname',
                 'label' => 'Imię',
@@ -38,7 +54,7 @@ class Pracownicy extends MY_Controller {
             array(
                 'field' => 'email',
                 'label' => 'E-mail',
-                'rules' => 'valid_email|required'
+                'rules' => 'valid_email|required|callback_workernotexists'
             ),
             array(
                 'field' => 'phone',
@@ -47,7 +63,7 @@ class Pracownicy extends MY_Controller {
             ),
         );
 
-        $this->form_validation->set_rules($worker_form_config);
+        $this->form_validation->set_rules($config);
         
         if (true === $this->form_validation->run()) {
             if (true === $this->editWorker()) {
@@ -56,8 +72,8 @@ class Pracownicy extends MY_Controller {
                 $this->template->current_view = 'pracownicy/pracownicy/error_zmien';
             }
         } else {
-            if (0 !== $this->worker_id) {
-                $worker = $this->pm->getWorker($this->worker_id);
+            if (0 !== $this->data['worker_id']) {
+                $worker = $this->pm->getWorker($this->data['worker_id']);
 
                 $_POST['firstname'] = $worker['firstname'];
                 $_POST['surname'] = $worker['surname'];
@@ -65,6 +81,7 @@ class Pracownicy extends MY_Controller {
                 $_POST['phone'] = $worker['phone'];
             }
         }
+        $this->template->set($this->data);
         $this->template->render();
     }
 
@@ -81,16 +98,23 @@ class Pracownicy extends MY_Controller {
     }
 
     // MODEL INTERFACE
+    public function workerNotExists($worker_email) {
+        if ($this->pm->workerExists($worker_email, $this->data['worker_id'])) {
+            $this->form_validation->set_message('workernotexists', 'Pracownik o podanym emailu już istnieje.');
+            return false;
+        }
+        return true;
+    }
+
     public function editWorker() {
-        if ($this->pm->editWorker($this->worker_id))
+        if (true === $this->pm->editWorker($this->data['worker_id']))
             return true;
         return false;
     }
 
     public function deleteWorker() {
-        if (true === $this->pm->deleteWorker($this->worker_id)) {
+        if (true === $this->pm->deleteWorker($this->data['worker_id']))
             return true;
-        }
         return false;
     }
 }

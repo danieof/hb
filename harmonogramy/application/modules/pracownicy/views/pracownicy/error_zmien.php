@@ -1,2 +1,2 @@
 <?php
-echo 'Nie udalo sie zmienic. Pracownik o podanych danych juz istnieje!';
+echo 'Nie udało się zmienić. Pracownik o podanych danych już istnieje!';
