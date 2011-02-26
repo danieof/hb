@@ -18,7 +18,9 @@
     <?php endif; ?>
         <td><?=$schedule['name'];?></td>
         <td><?=ul($schedule['duties']);?></td>
-        <td>opcje</td>
+        <td>
+            <?=anchor(site_url('harmonogramy/edytuj/') . '/' . $schedule['id'], 'edytuj dane');?>
+        </td>
     </tr>
     <?php endforeach; ?>
     </tbody>
@@ -30,6 +32,7 @@
 
 <div class="pagination"><?=$pagination;?></div>
 
+<!--
 <script type="text/javascript">
     $(function(){
         $("tr[id!='']").each(function(){
@@ -40,6 +43,7 @@
         });
     });
 </script>
+-->
 <?php else : ?>
     Nie masz jeszcze harmonogramów. <?=anchor($edit_location, 'Dodaj');?>
 <?php endif; ?>

@@ -38,7 +38,7 @@ class Harmonogramy extends MY_Controller {
             array(
                 'field' => 'name',
                 'label' => 'Nazwa',
-                'rules' => 'required'
+                'rules' => 'required|callback_schedulenotexists'
             ),
         );
 
@@ -62,6 +62,14 @@ class Harmonogramy extends MY_Controller {
     }
 
     // MODEL INTERFACE
+    public function scheduleNotExists($schedule_name) {
+        if ($this->hm->scheduleExists($schedule_name, $this->data['schedule_id'])) {
+            $this->form_validation->set_message('schedulenotexists', 'Harmonogram o podanych danych już istnieje.');
+            return false;
+        }
+        return true;
+    }
+
     public function editSchedule() {
         if (true === $this->hm->editSchedule($this->data['schedule_id']))
             return true;

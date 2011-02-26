@@ -60,9 +60,6 @@ class Harmonogramy_model extends CI_Model {
             'name' => $this->input->post('name', true)
         );
 
-        if ($this->scheduleExists($d['name'], $schedule_id))
-            return false;
-
         $this->db->trans_start();
 
         if (0 === $schedule_id) {
@@ -93,7 +90,7 @@ class Harmonogramy_model extends CI_Model {
         
     }
 
-    private function scheduleExists($schedule_name, $schedule_id = 0) {
+    public function scheduleExists($schedule_name, $schedule_id = 0) {
         $res = $this->db->select('s.id')
                         ->from($this->t_users . ' AS u')
                         ->join($this->t_users_schedules . ' AS us', 'u.id = us.user_id')
