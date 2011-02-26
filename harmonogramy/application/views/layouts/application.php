@@ -1,14 +1,22 @@
 <?php echo $this->template->block('header', 'partials/header'); ?>
-<?php
-    echo anchor('uzytkownicy/lista_pracownicy/', 'Lista pracownikow') . '<br />';
-    echo anchor('pracownicy/edytuj', 'Dodaj pracownika') . '<br />';
-    echo anchor('uzytkownicy/lista_harmonogramy/', 'Lista harmonogramow') . '<br />';
-    echo anchor('uzytkownicy/lista_obowiazki/', 'Lista obowiazkow') . '<br />';
-    echo anchor('uzytkownicy/lista_role/', 'Lista rol') . '<br />';
-    echo anchor('uzytkownicy/zaloguj/', 'Zaloguj') . '<br />';
-    echo anchor('uzytkownicy/wyloguj/', 'Wyloguj') . '<br />';
-
-    echo '<br /><br />';
-?>
+<div id="top">
+    <div id="top_menu">
+        <?php
+        if ($this->tank_auth->is_logged_in()) {
+            echo anchor('pracownicy/lista/', 'Lista pracownikow') . '<br />';
+            echo anchor('harmonogramy/lista/', 'Lista harmonogramow') . '<br />';
+            echo anchor('obowiazki/lista/', 'Lista obowiazkow') . '<br />';
+            echo anchor('role/lista/', 'Lista rol') . '<br />';
+            echo anchor('uzytkownicy/wyloguj/', 'Wyloguj') . '<br />';
+            echo '<br />';
+        }
+        ?>
+    </div>
+</div>
+<div id="center">
 <?php echo $this->template->yield(); ?>
+</div>
+<div id="bottom">
+
+</div>
 <?php echo $this->template->block('footer', 'partials/footer'); ?>
