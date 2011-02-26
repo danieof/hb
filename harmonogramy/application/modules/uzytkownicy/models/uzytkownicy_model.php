@@ -10,8 +10,10 @@ class Uzytkownicy_model extends CI_Model {
     private $t_users_schedules;
     private $t_users_workers;
     private $t_duties;
+    private $t_duty_week_days;
     private $t_roles;
     private $t_schedules;
+    private $t_schedules_duties;
     private $t_workers;
 
     private $user_id;
@@ -25,8 +27,10 @@ class Uzytkownicy_model extends CI_Model {
         $this->t_users_roles = 'users_roles';
         $this->t_users_workers = 'users_workers';
         $this->t_duties = 'duties';
+        $this->t_duty_week_days = 'duty_week_days';
         $this->t_roles = 'roles';
         $this->t_schedules = 'schedules';
+        $this->t_schedules_duties = 'schedules_duties';
         $this->t_workers = 'workers';
         
         $this->user_id = $this->session->userdata('user_id');
@@ -55,91 +59,11 @@ class Uzytkownicy_model extends CI_Model {
     }
 
     // COUNT DATA
-    public function countWorkers() {
-        $res = $this->db->select()
-                        ->from($this->t_users_workers . ' AS uw ')
-                        ->join($this->t_workers . ' AS w ', 'w.id = uw.worker_id')
-                        ->where('uw.user_id', $this->user_id)
-                        ->get()->num_rows();
-        return $res;
-    }
-
-    public function countDuties() {
-        $res = $this->db->select()
-                        ->from($this->t_users_duties . ' AS ud')
-                        ->join($this->t_duties . ' AS d', 'd.id = ud.duty_id')
-                        ->where('ud.user_id', $this->user_id)
-                        ->get()->num_rows();
-        return $res;
-    }
-
-    public function countSchedules() {
-        $res = $this->db->select()
-                        ->from($this->t_users_schedules . ' AS us')
-                        ->join($this->t_schedules . ' AS s', 's.id = us.schedule_id')
-                        ->where('us.user_id', $this->user_id)
-                        ->get()->num_rows();
-        return $res;
-    }
-
-    public function countRoles() {
-        $res = $this->db->select()
-                        ->from($this->t_users_roles . ' AS ur')
-                        ->join($this->t_roles . ' AS r', 'r.id = ur.role_id')
-                        ->where('ur.user_id', $this->user_id)
-                        ->get()->num_rows();
-        return $res;
-    }
 
     // GET MULTIPLE DATA
     public function getUsers() {
-        $res = $this->db->select()->get($this->table);
-        $res = $res->result_array();
+        $res = $this->db->select()->get($this->table)->result_array();
         return $res;
     }
 
-    public function getWorkers($limit, $offset) {
-        $res = $this->db->select()
-                        ->from($this->t_users_workers . ' AS uw ')
-                        ->join($this->t_workers . ' AS w ', 'w.id = uw.worker_id')
-                        ->where('uw.user_id', $this->user_id)
-                        ->limit($limit, $offset)
-                        ->get()->result_array();
-        // ucfirst
-        foreach ($res as $k => $r) {
-            $res[$k]['firstname'] = ucfirst($r['firstname']);
-            $res[$k]['surname']   = ucfirst($r['surname']);
-        }
-        return $res;
-    }
-
-    public function getRoles($limit, $offset) {
-        $res = $this->db->select()
-                        ->from($this->t_users_roles . ' AS ur')
-                        ->join($this->t_roles . ' AS r', 'r.id = ur.role_id')
-                        ->where('ur.user_id', $this->user_id)
-                        ->limit($limit, $offset)
-                        ->get()->result_array();
-        return $res;
-    }
-
-    public function getDuties($limit, $offset) {
-        $res = $this->db->select()
-                        ->from($this->t_users_duties . ' AS ud')
-                        ->join($this->t_duties . ' AS d', 'd.id = ud.duty_id')
-                        ->where('ud.user_id', $this->user_id)
-                        ->limit($limit, $offset)
-                        ->get()->result_array();
-        return $res;
-    }
-
-    public function getSchedules($limit, $offset) {
-        $res = $this->db->select()
-                        ->from($this->t_users_schedules . ' AS us')
-                        ->join($this->t_schedules . ' AS s', 's.id = us.schedule_id')
-                        ->where('us.user_id', $this->user_id)
-                        ->limit($limit, $offset)
-                        ->get()->result_array();
-        return $res;
-    }
 }
