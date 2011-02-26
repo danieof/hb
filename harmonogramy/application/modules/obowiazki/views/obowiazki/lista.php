@@ -26,7 +26,9 @@
         <td><?=$duty['hour_start'];?></td>
         <td><?=$duty['hour_end'];?></td>
         <td><?=ul($duty['week_days']);?></td>
-        <td>opcje</td>
+        <td>
+            <?=anchor(site_url('obowiazki/edytuj/') . '/' . $duty['id'], 'edytuj dane')?>
+        </td>
     </tr>
     <?php endforeach; ?>
     </tbody>
@@ -38,6 +40,7 @@
 
 <div class="pagination"><?=$pagination;?></div>
 
+<!--
 <script type="text/javascript">
     $(function(){
         $("tr[id!='']").each(function(){
@@ -48,6 +51,7 @@
         });
     });
 </script>
+-->
 <?php else : ?>
     Nie masz jeszcze obowiązków. <?=anchor($edit_location, 'Dodaj');?>
 <?php endif; ?>
