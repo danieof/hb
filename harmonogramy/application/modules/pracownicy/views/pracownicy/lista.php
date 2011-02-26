@@ -1,5 +1,5 @@
 <?php if (0 < $total_rows) : ?>
-<?=anchor($edit_location, 'Dodaj');?>
+<?=anchor(site_url('pracownicy/edytuj/'), 'Dodaj');?>
 <table>
     <caption>Pracownicy</caption>
     <thead>
@@ -22,7 +22,13 @@
         <td><?=$worker['surname'];?></td>
         <td><?=$worker['email'];?></td>
         <td><?=$worker['phone'];?></td>
-        <td>opcje</td>
+        <td>
+            <?=anchor(site_url('pracownicy/edytuj/') . '/' . $worker['id'], 'edytuj dane');?>
+            <br />
+            <?=anchor(site_url('pracownicy_limity/lista/') . '/' . $worker['id'], 'pokaż limity');?>
+            <br />
+            <?=anchor(site_url('pracownicy/edytuj_role/') . '/' . $worker['id'], 'edytuj role');?>
+        </td>
     </tr>
     <?php endforeach; ?>
     </tbody>
@@ -34,6 +40,7 @@
 
 <div class="pagination"><?=$pagination;?></div>
 
+<!--
 <script type="text/javascript">
     $(function(){
         $("tr[id!='']").each(function(){
@@ -44,6 +51,7 @@
         });
     });
 </script>
+-->
 <?php else : ?>
-    Nie masz jeszcze pracowników. <?=anchor($edit_location, 'Dodaj');?>
+    Nie masz jeszcze pracowników. <?=anchor(site_url('pracownicy/edytuj/'), 'Dodaj');?>
 <?php endif; ?>

@@ -149,4 +149,23 @@ class Pracownicy_model extends CI_Model {
                         ->get()->num_rows();
         return $res;
     }
+
+    // LISTA LIMITY
+    public function getWorkersDutyLimits($worker_id, $limit, $offset) {
+        $res = $this->db->select()
+                        ->from($this->t_workers_duty_limits . ' AS wdl')
+                        ->join($this->t_users_workers . ' AS uw', 'uw.worker_id = wdl.worker_id')
+                        ->where('uw.user_id', $this->user_id)
+                        ->get()->result_array();
+        return $res;
+    }
+
+    public function countWorkersDutyLimits() {
+        $res = $this->db->select()
+                        ->from($this->t_workers_duty_limits . ' AS wdl')
+                        ->join($this->t_users_workers . ' AS uw', 'uw.worker_id = wdl.worker_id')
+                        ->where('uw.user_id', $this->user_id)
+                        ->get()->num_rows();
+        return $res;
+    }
 }

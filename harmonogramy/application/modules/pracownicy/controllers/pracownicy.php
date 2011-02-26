@@ -15,6 +15,8 @@ class Pracownicy extends MY_Controller {
             redirect('pracownicy/edytuj/');
 
         $this->load->model('pracownicy_model','pm');
+        $this->data['pagination_config']['num_links'] = 2;
+        $this->data['pagination_config']['per_page'] = 10;
 	}
 
 	public function index() {
@@ -23,8 +25,6 @@ class Pracownicy extends MY_Controller {
 
     public function lista() {
         $this->data['pagination_config']['base_url'] = site_url('pracownicy/lista/');
-        $this->data['pagination_config']['num_links'] = 2;
-        $this->data['pagination_config']['per_page'] = 10;
         $this->data['pagination_config']['uri_segment'] = 3;
         $this->data['pagination_config']['total_rows'] = $this->pm->countWorkers();
 
@@ -32,7 +32,6 @@ class Pracownicy extends MY_Controller {
         $this->data['workers'] = $this->pm->getWorkers($this->data['pagination_config']['per_page'],
                                                        (int) $this->uri->segment(3));
         $this->data['pagination'] = $this->pagination();
-        $this->data['edit_location'] = site_url('pracownicy/edytuj');
         $this->data['css'] .= ',table';
 
         $this->template->set($this->data);
@@ -85,16 +84,8 @@ class Pracownicy extends MY_Controller {
         $this->template->render();
     }
 
-    public function lista_obowiazki() {
-        $this->template->render();
-    }
-
-    public function edytuj_obowiazki() {
-        $this->template->render();
-    }
-
     public function usun() {
-        $this->deleteWorker();
+        //$this->deleteWorker();
     }
 
     // MODEL INTERFACE
