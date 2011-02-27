@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Czas wygenerowania: 26 Lut 2011, 12:12
+-- Czas wygenerowania: 27 Lut 2011, 10:17
 -- Wersja serwera: 5.1.41
 -- Wersja PHP: 5.3.1
 
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `duties` (
   `hour_start` time NOT NULL,
   `hour_end` time NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 -- --------------------------------------------------------
 
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `duty_week_days` (
   `duty_id` int(1) NOT NULL,
   `week_day` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=44 ;
 
 -- --------------------------------------------------------
 
@@ -73,8 +73,9 @@ CREATE TABLE IF NOT EXISTS `duty_week_days` (
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` text NOT NULL,
+  `state` varchar(15) NOT NULL DEFAULT 'active',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -86,9 +87,21 @@ CREATE TABLE IF NOT EXISTS `roles_duty_limitis` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `duty_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `week_day` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `roles_duty_limits_week_days`
+--
+
+CREATE TABLE IF NOT EXISTS `roles_duty_limits_week_days` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `duty_limit_id` int(11) NOT NULL,
+  `week_day` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -113,8 +126,22 @@ CREATE TABLE IF NOT EXISTS `roles_duty_priorities` (
 CREATE TABLE IF NOT EXISTS `schedules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` text NOT NULL,
+  `state` varchar(15) NOT NULL DEFAULT 'active',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `schedules_duties`
+--
+
+CREATE TABLE IF NOT EXISTS `schedules_duties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `duty_id` int(11) NOT NULL,
+  `schedule_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 -- --------------------------------------------------------
 
@@ -226,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `users_duties` (
   `user_id` int(11) NOT NULL,
   `duty_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 -- --------------------------------------------------------
 
@@ -239,7 +266,7 @@ CREATE TABLE IF NOT EXISTS `users_roles` (
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -252,7 +279,7 @@ CREATE TABLE IF NOT EXISTS `users_schedules` (
   `user_id` int(11) NOT NULL,
   `schedule_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -279,6 +306,7 @@ CREATE TABLE IF NOT EXISTS `workers` (
   `surname` varchar(64) NOT NULL,
   `email` varchar(64) NOT NULL,
   `phone` varchar(16) NOT NULL,
+  `state` varchar(15) NOT NULL DEFAULT 'active',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
 
@@ -292,9 +320,21 @@ CREATE TABLE IF NOT EXISTS `workers_duty_limits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `duty_id` int(11) NOT NULL,
   `worker_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `workers_duty_limits_week_days`
+--
+
+CREATE TABLE IF NOT EXISTS `workers_duty_limits_week_days` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `duty_limit_id` int(11) NOT NULL,
   `week_day` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
 
 -- --------------------------------------------------------
 
