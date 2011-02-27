@@ -178,14 +178,10 @@ class Obowiazki_model extends CI_Model {
                         ->where('ud.user_id', $this->user_id)
                         ->limit($limit, $offset)
                         ->get()->result_array();
-        $this->load->helper('weekdays');
         if (!empty($res)) {
+            $this->load->helper('weekdays');
             foreach ($res as $key => $duty) {
-                $res[$key]['week_days'] = $this->db->select('dwd.week_day')
-                                                   ->from($this->t_duties . ' AS d')
-                                                   ->join($this->t_duty_week_days . ' AS dwd', 'd.id = dwd.duty_id')
-                                                   ->where('dwd.duty_id', $duty['id'])
-                                                   ->get()->result_array();
+                $res[$key]['week_days'] = $this->getDutyWeekDays($duty['id']);
                 $res[$key]['week_days'] = getWeekDaysForList($res[$key]['week_days']);
             }
         }
