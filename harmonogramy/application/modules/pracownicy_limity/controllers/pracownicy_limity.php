@@ -10,15 +10,17 @@ class Pracownicy_limity extends MY_Controller {
             redirect('uzytkownicy/zaloguj/');
 
         $this->data['worker_id'] = (int) $this->uri->segment(3);
+        if (0 === $this->data['worker_id'])
+            redirect('pracownicy/lista/');
+
         $this->data['duty_limit_id'] = (int) $this->uri->segment(4);
-        if (0 > $this->data['duty_limit_id'] &&
+        if (0 === $this->data['duty_limit_id'] &&
             !preg_match('#pracownicy_limity/lista#i', current_url()))
             redirect('pracownicy_limity/edytuj/' . $this->data['worker_id']);
 
         $this->load->model('pracownicylimity_model','plm');
         $this->data['pagination_config']['num_links'] = 2;
         $this->data['pagination_config']['per_page'] = 10;
-        $this->data['css'] .= ',table';
 	}
 
 	public function index() {
@@ -32,9 +34,10 @@ class Pracownicy_limity extends MY_Controller {
         $this->data['pagination_config']['total_rows'] = $this->plm->countWorkersDutyLimits();
 
         $this->data['total_rows'] = $this->data['pagination_config']['total_rows'];
-        $this->data['workers_limits'] = $this->plm->getWorkersDutyLimits($this->data['worker_id'],
+        $this->data['workers_duty_limits'] = $this->plm->getWorkersDutyLimits(
                                                                          $this->data['pagination_config']['per_page'],
                                                                          (int) $this->uri->segment(4));
+        $this->data['css'] .= ',table';
         $this->data['pagination'] = $this->pagination();
 
         $this->template->set($this->data);
@@ -64,16 +67,16 @@ class Pracownicy_limity extends MY_Controller {
         $this->form_validation->set_rules($config);
 
         if (true === $this->form_validation->run()) {
-            if (true === $this->editWorkersLimit($this->data['duty_limit_id'])) {
-                $this->template->current_view = 'pracownicy/pracownicy/sukces_zmien';
+            if (true === $this->editWorkersDutyLimits($this->data['duty_limit_id'])) {
+                $this->template->current_view = 'pracownicy_limity/pracownicy_limity/sukces_zmien';
             } else {
-                $this->template->current_view = 'pracownicy/pracownicy/error_zmien';
+                $this->template->current_view = 'pracownicy_limity/pracownicy_limity/error_zmien';
             }
         } else {
             if (0 !== $this->data['duty_limit_id']) {
                 $workers_duty_limit = $this->plm->getWorkersDutyLimit($this->data['duty_limit_id']);
-
-                $_POST['duty_id'] = $workers_duty_limit['id'];
+                
+                $_POST['duty_id'] = $workers_duty_limit['duty_id'];
                 $_POST['week_days'] = $workers_duty_limit['week_days'];
             }
         }
@@ -93,18 +96,18 @@ class Pracownicy_limity extends MY_Controller {
     }
 
     public function usun() {
-        $this->deleteWorker();
+        
     }
 
     // MODEL INTERFACE
-    public function editWorkersLimit($duty_limit_id) {
-        if (true === $this->plm->editWorkersDutyLimit($duty_limit_id))
+    public function editWorkersDutyLimits($duty_limit_id) {
+        if (true === $this->plm->editWorkersDutyLimits($duty_limit_id))
             return true;
         return false;
     }
 
-    public function deleteWorkersLimit() {
-        if (true === $this->plm->deleteWorkersDutyLimit($this->data['duty_limit_id']))
+    public function deleteWorkersDutyLimits($duty_limit_id) {
+        if (true === $this->plm->deleteWorkersDutyLimit($duty_limit_id))
             return true;
         return false;
     }

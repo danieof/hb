@@ -9,6 +9,8 @@ $week_days = array(
     'label' => 'Dni tygodnia:',
     'value' => (isset($_POST['week_days']))?$_POST['week_days']:set_value('week_days')
 );
+//print_R($duty);
+//print_r($week_days);
 
 echo form_open(current_url());
 ?>

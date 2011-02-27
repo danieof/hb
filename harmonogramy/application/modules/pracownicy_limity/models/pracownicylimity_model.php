@@ -51,11 +51,11 @@ class Pracownicylimity_model extends CI_Model {
         $this->worker_id = $this->uri->segment(3);
     }
 
-    public function editWorkersDutyLimit($duty_limit_id) {
+    public function editWorkersDutyLimits($duty_limit_id) {
         $week_days = $this->input->post('week_days', true);
         $duty_id = $this->input->post('duty_id', true);
-
-        $this->db->trans_start();
+        
+        //$this->db->trans_start();
 
         if (0 === $duty_limit_id) {
             $this->db->insert($this->t_workers_duty_limits,
@@ -65,7 +65,28 @@ class Pracownicylimity_model extends CI_Model {
                     ));
             $duty_limit_id = $this->db->insert_id();
         } else {
-            $this->db->where('id', $duty_limid_id)->update($this->t_workers_duty_limits);
+            // if duty_id exists in db then delete this one, and change to the other one
+            $res = $this->db->select('id')
+                            ->from($this->t_workers_duty_limits)
+                            ->where('duty_id', $duty_id)
+                            ->get()->result_array();
+            if (1 < count($res)) {
+                $this->db->where('duty_limit_id', $duty_limit_id)->delete($this->t_workers_duty_limits_week_days);
+                $this->db->where('id', $duty_limit_id)->delete($this->t_workers_duty_limits);
+                if ($duty_limit_id == $res[0]['id']) {
+                    $duty_limit_id = $res[1]['id'];
+                } else {
+                    $duty_limit_id = $res[0]['id'];
+                }
+            } else {
+                $data = array(
+                    'id' => $duty_limit_id,
+                    'duty_id' => $duty_id,
+                    'worker_id' => $this->worker_id
+                );
+                $this->db->where('id', $duty_limit_id)->delete($this->t_workers_duty_limits);
+                $this->db->insert($this->t_workers_duty_limits, $data);
+            }
         }
         $this->editWorkersDutyLimitsWeekDays($duty_limit_id, $week_days);
 
@@ -79,13 +100,24 @@ class Pracownicylimity_model extends CI_Model {
         $this->db->where('duty_limit_id', $duty_limit_id)
                  ->delete($this->t_workers_duty_limits_week_days);
 
-        foreach ($week_days as $week_day) {
-            $d = array(
-                'duty_limit_id' => $duty_limit_id,
-                'week_day' => $week_day
-            );
+        // get duty week days
+        $this->load->model('obowiazki/obowiazki_model', 'om');
+        list($duty_id) = $this->db->select('duty_id')
+                                  ->from($this->t_workers_duty_limits)
+                                  ->where('id', $duty_limit_id)
+                                  ->get()->result_array();
+        $duty_id = $duty_id['duty_id'];
+        $duty_week_days = $this->om->getDutyWeekDays($duty_id);
 
-            $this->db->insert($this->t_workers_duty_limits_week_days, $d);
+        foreach ($week_days as $week_day) {
+            if (in_array($week_day, $duty_week_days)) {
+                $d = array(
+                    'duty_limit_id' => $duty_limit_id,
+                    'week_day' => $week_day
+                );
+
+                $this->db->insert($this->t_workers_duty_limits_week_days, $d);
+            }
         }
     }
 
@@ -94,24 +126,48 @@ class Pracownicylimity_model extends CI_Model {
                         ->from($this->t_workers_duty_limits . ' AS wdl')
                         ->join($this->t_users_workers . ' AS uw', 'uw.worker_id = wdl.worker_id')
                         ->where('uw.user_id', $this->user_id)
-                        ->where('uw.user_id', $this->worker_id)
+                        ->where('wdl.worker_id', $this->worker_id)
                         ->where('wdl.id', $duty_limit_id)
                         ->get()->result_array();
         if (!empty($res)) {
-            
+            $this->load->helper('weekdays');
+            foreach ($res as $key => $duty) {
+                $res[$key]['week_days'] = $this->getWorkersDutyLimitsWeekDays($duty['duty_id']);
+                //$res[$key]['week_days'] = getWeekDaysForList($res[$key]['week_days']);
+            }
+            $res = $res[0];
+        }
+        return $res;
+    }
+
+    public function getWorkersDutyLimitsWeekDays($duty_limit_id) {
+        $res = $this->db->select('week_day')
+                        ->from($this->t_workers_duty_limits_week_days)
+                        ->where('duty_limit_id', $duty_limit_id)
+                        ->get()->result_array();
+        if (!empty($res)) {
+            $res = array_map(create_function('$elem', 'return $elem[\'week_day\'];'), $res);
         }
         return $res;
     }
 
     // LISTA LIMITY
     public function getWorkersDutyLimits($limit, $offset) {
-        $res = $this->db->select()
+        $res = $this->db->select('wdl.id, wdl.duty_id, d.name')
                         ->from($this->t_workers_duty_limits . ' AS wdl')
                         ->join($this->t_users_workers . ' AS uw', 'uw.worker_id = wdl.worker_id')
+                        ->join($this->t_duties . ' AS d', 'd.id = wdl.duty_id')
                         ->where('uw.user_id', $this->user_id)
                         ->where('wdl.worker_id', $this->worker_id)
                         ->limit($limit, $offset)
                         ->get()->result_array();
+        if (!empty($res)) {
+            $this->load->helper('weekdays');
+            foreach ($res as $key => $duty) {
+                $res[$key]['week_days'] = $this->getWorkersDutyLimitsWeekDays($duty['id']);
+                $res[$key]['week_days'] = getWeekDaysForList($res[$key]['week_days']);
+            }
+        }
         return $res;
     }
 

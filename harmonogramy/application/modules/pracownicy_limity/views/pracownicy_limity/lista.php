@@ -1,4 +1,5 @@
-<?php if (0 < $total_rows) : ?>
+<?php
+if (0 < $total_rows) : ?>
 <?=anchor(site_url('pracownicy_limity/edytuj/') . '/' . $worker_id, 'Dodaj');?>
 <table>
     <caption>Limity pracownika</caption>
@@ -10,16 +11,12 @@
         </tr>
     </thead>
     <tbody>
-    <?php foreach ($workersdutylimis as $k => $wdl) : ?>
-    <?php if ($k % 2) : ?>
-    <tr id="<?=$wdl['id'];?>">
-    <?php else : ?>
-    <tr class="odd" id="<?=$wdl['id'];?>">
-    <?php endif; ?>
-        <td><?=$wdl['duty_name'];?></td>
-        <td><?=$wdl['duty_week_days'];?></td>
+    <?php foreach ($workers_duty_limits as $k => $worker_duty_limit) : ?>
+    <tr<?=($k % 2) ? '' : ' class="odd"';?>>
+        <td><?=$worker_duty_limit['name'];?></td>
+        <td><?=ul($worker_duty_limit['week_days']);?></td>
         <td>
-            <?=anchor(site_url('pracownicy_limity/edytuj/') . '/' . $worker_id . '/' . $wdl['id'], 'edytuj limit');?>
+            <?=anchor(site_url('pracownicy_limity/edytuj/') . '/' . $worker_id . '/' . $worker_duty_limit['id'], 'edytuj limit');?>
         </td>
     </tr>
     <?php endforeach; ?>
